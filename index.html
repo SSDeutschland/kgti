@@ -1,0 +1,2349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>人格测试问卷</title>
+  <style>
+    :root {
+      --bg: #f6faf6;
+      --panel: #ffffff;
+      --text: #1e2a22;
+      --muted: #6a786f;
+      --line: #dbe8dd;
+      --soft: #edf6ef;
+      --accent: #6c8d71;
+      --accent-strong: #4d6a53;
+      --shadow: 0 16px 40px rgba(47, 73, 55, 0.08);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background:
+        radial-gradient(circle at top left, #f8fff8 0, #f6faf6 36%, #f2f7f3 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .shell {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 24px 16px 56px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      padding: 28px;
+      margin-top: 20px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -60px;
+      top: -60px;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, rgba(127, 165, 134, 0.18), rgba(127, 165, 134, 0.02));
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--accent-strong);
+      border: 1px solid var(--line);
+      background: var(--soft);
+      border-radius: 999px;
+      padding: 8px 12px;
+      margin-bottom: 16px;
+    }
+
+    h1, h2, h3, p { margin: 0; }
+    .hero h1 {
+      font-size: clamp(28px, 5vw, 52px);
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      max-width: 680px;
+    }
+    .hero .sub {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.75;
+      max-width: 720px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.3fr 0.9fr;
+      gap: 18px;
+      align-items: stretch;
+      margin-top: 24px;
+    }
+
+    .mini-panel {
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, #fbfefb, #f3f8f4);
+    }
+
+    .mini-panel h3 {
+      font-size: 15px;
+      margin-bottom: 10px;
+    }
+
+    .mini-panel ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      line-height: 1.8;
+      font-size: 14px;
+    }
+
+        .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 22px;
+    }
+    .hero-minimal {
+      min-height: 48vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 42px 20px;
+    }
+    .hero-minimal::after { display: none; }
+    .hero-minimal h1 {
+      max-width: none;
+      margin: 0;
+    }
+    .hero-actions-single {
+      justify-content: center;
+      margin-top: 28px;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      transition: transform .16s ease, box-shadow .16s ease, opacity .16s ease;
+      font: inherit;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:disabled { cursor: not-allowed; opacity: 0.55; transform: none; }
+
+    .btn-primary {
+      background: var(--accent-strong);
+      color: #fff;
+      padding: 14px 20px;
+      border-radius: 14px;
+      box-shadow: 0 12px 30px rgba(77, 106, 83, 0.18);
+      font-weight: 700;
+    }
+
+    .btn-secondary {
+      background: #fff;
+      color: var(--accent-strong);
+      padding: 14px 20px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      font-weight: 700;
+    }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    .test-wrap,
+    .result-wrap {
+      margin-top: 22px;
+      padding: 22px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .progress {
+      flex: 1;
+      min-width: 240px;
+      height: 10px;
+      background: #edf3ee;
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress > span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, #97b59c, #5b7a62);
+      border-radius: inherit;
+      transition: width .22s ease;
+    }
+
+    .progress-text {
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .question-list {
+      display: grid;
+      gap: 16px;
+    }
+
+    .question {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      background: linear-gradient(180deg, #ffffff, #fbfdfb);
+    }
+
+    .question-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 6px 10px;
+      background: var(--soft);
+      border: 1px solid var(--line);
+    }
+
+    .question-title {
+      font-size: 16px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+    }
+
+    .options {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .option {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: #fff;
+      transition: border-color .16s ease, background .16s ease, transform .16s ease;
+    }
+
+    .option:hover {
+      border-color: #bcd0c1;
+      background: #f8fcf9;
+    }
+
+    .option input {
+      margin-top: 3px;
+      accent-color: var(--accent-strong);
+      transform: scale(1.1);
+      flex-shrink: 0;
+    }
+
+    .option-code {
+      font-weight: 800;
+      color: var(--accent-strong);
+      min-width: 22px;
+    }
+
+    .actions-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+      padding-top: 6px;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .result-hero {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .type-box,
+    .score-box,
+    .dim-box,
+    .top3-box,
+    .about-box {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      background: linear-gradient(180deg, #ffffff, #fbfdfb);
+    }
+
+    .type-kicker {
+      font-size: 12px;
+      color: var(--accent-strong);
+      margin-bottom: 8px;
+      letter-spacing: .05em;
+    }
+
+    .type-name {
+      font-size: clamp(30px, 5vw, 48px);
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+    }
+
+    .type-subname {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .match {
+      margin-top: 18px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 10px 14px;
+      background: var(--soft);
+      border: 1px solid var(--line);
+      color: var(--accent-strong);
+      font-weight: 700;
+    }
+
+    .type-desc {
+      margin-top: 18px;
+      line-height: 1.85;
+      font-size: 15px;
+      color: #304034;
+    }
+
+    .score-box h3,
+    .dim-box h3,
+    .top3-box h3,
+    .about-box h3 {
+      font-size: 16px;
+      margin-bottom: 12px;
+    }
+
+    .score-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .score-item {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      background: #fff;
+    }
+
+    .score-item .k {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .score-item .v {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--accent-strong);
+    }
+
+    .dim-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .dim-pill {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      background: #fff;
+    }
+
+    .dim-pill .label {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+
+    .dim-pill .value {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--accent-strong);
+    }
+
+    .top3-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .top3-item {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      background: #fff;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .top3-item strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .top3-item span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .top3-score {
+      color: var(--accent-strong);
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .about-box p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .footer-note {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    
+    .result-layout {
+      display: grid;
+      gap: 18px;
+    }
+    .result-top {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+    .poster-box, .type-box, .analysis-box, .dim-box, .note-box {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      background: linear-gradient(180deg, #ffffff, #fbfdfb);
+    }
+        .poster-box {
+      display: grid;
+      grid-template-rows: 1fr auto;
+      min-height: 280px;
+      overflow: hidden;
+      position: relative;
+      background:
+        radial-gradient(circle at top right, rgba(127,165,134,0.16), rgba(127,165,134,0) 40%),
+        linear-gradient(180deg, #ffffff, #f7fbf8);
+    }
+    .poster-box::after {
+      content: "";
+      position: absolute;
+      right: -46px;
+      bottom: -46px;
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, rgba(127,165,134,0.12), rgba(127,165,134,0.01));
+      pointer-events: none;
+    }
+    .poster-image {
+      width: 100%;
+      min-height: 220px;
+      max-height: 460px;
+      object-fit: contain;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.75);
+      position: relative;
+      z-index: 1;
+    }
+    .poster-box.no-image .poster-image {
+      display: none;
+    }
+    .poster-image-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: linear-gradient(180deg, #f8fcf8, #f0f6f0);
+      border-radius: 18px;
+      min-height: 200px;
+    }
+    .poster-image-placeholder svg {
+      opacity: 0.6;
+    }
+    .placeholder-text {
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .poster-caption {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.8;
+      position: relative;
+      z-index: 1;
+    }
+    .type-kicker {
+      font-size: 12px;
+      color: var(--accent-strong);
+      margin-bottom: 8px;
+      letter-spacing: .06em;
+    }
+    .type-name {
+      font-size: clamp(30px, 5vw, 48px);
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+    }
+    .type-subname {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+    .match {
+      margin-top: 18px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 10px 14px;
+      background: var(--soft);
+      border: 1px solid var(--line);
+      color: var(--accent-strong);
+      font-weight: 700;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+    .analysis-box h3, .dim-box h3, .note-box h3 {
+      font-size: 16px;
+      margin-bottom: 12px;
+    }
+    .result-actions {
+      margin-top: 22px;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .analysis-box p {
+      margin: 0;
+      color: #304034;
+      font-size: 15px;
+      line-height: 1.9;
+      white-space: pre-wrap;
+    }
+    .dim-list {
+      display: grid;
+      gap: 12px;
+    }
+    .dim-item {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+      background: #fff;
+    }
+    .dim-item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+    .dim-item-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .dim-item-score {
+      color: var(--accent-strong);
+      font-weight: 800;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+    .dim-item p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+    .note-box p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .author-box {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: linear-gradient(180deg, #ffffff, #fbfdfb);
+      overflow: hidden;
+    }
+    .author-box summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 18px;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .author-box summary::-webkit-details-marker { display: none; }
+    .author-box summary::after {
+      content: '展开';
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent-strong);
+      border: 1px solid var(--line);
+      background: var(--soft);
+      padding: 6px 10px;
+      border-radius: 999px;
+      flex-shrink: 0;
+    }
+    .author-box[open] summary::after {
+      content: '收起';
+    }
+    .author-content {
+      border-top: 1px solid var(--line);
+      padding: 0 18px 18px;
+    }
+    .author-content p {
+      margin: 14px 0 0;
+      color: #304034;
+      font-size: 14px;
+      line-height: 1.9;
+    }
+
+    .result-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 22px;
+    }
+    @media (max-width: 860px) {
+      .result-top { grid-template-columns: 1fr; }
+    }
+
+  @media (max-width: 860px) {
+      .hero-grid,
+      .result-hero {
+        grid-template-columns: 1fr;
+      }
+      .dim-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 600px) {
+      .shell { padding: 14px 12px 42px; }
+      .hero, .test-wrap, .result-wrap { padding: 16px; }
+      .hero h1 { font-size: 32px; }
+      .question-title { font-size: 15px; }
+      .dim-grid,
+      .score-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section id="intro" class="screen active">
+      <div class="hero card hero-minimal">
+        <h1>人格测试问卷</h1>
+        <div class="hero-actions hero-actions-single">
+          <button id="startBtn" class="btn-primary">开始测试</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="test" class="screen">
+      <div class="test-wrap card">
+        <div class="topbar">
+          <div class="progress"><span id="progressBar"></span></div>
+          <div class="progress-text" id="progressText">0 / 30</div>
+        </div>
+
+        <div id="questionList" class="question-list"></div>
+
+        <div class="actions-bottom">
+          <div class="hint" id="testHint">全选完才会放行。世界已经够乱了，起码把题做完整。</div>
+          <div style="display:flex; gap:12px; flex-wrap:wrap;">
+            <button id="backIntroBtn" class="btn-secondary">返回首页</button>
+            <button id="submitBtn" class="btn-primary" disabled>提交并查看结果</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    
+    <section id="result" class="screen">
+      <div class="result-wrap card">
+        <div class="result-layout">
+          <div class="result-top">
+            <div class="poster-box" id="posterBox">
+              <div class="poster-image-placeholder" id="posterImagePlaceholder">
+                <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="120" height="120" rx="20" fill="#e8f0e8"/>
+                  <path d="M60 30C42 30 30 42 30 60C30 78 42 90 60 90C78 90 90 78 90 60C90 42 78 30 60 30ZM60 80C48 80 38 70 38 58C38 46 48 36 60 36C72 36 82 46 82 58C82 70 72 80 60 80Z" fill="#6c8d71"/>
+                  <circle cx="60" cy="58" r="12" fill="#6c8d71"/>
+                  <path d="M50 85C50 85 55 78 60 78C65 78 70 85 70 85" stroke="#6c8d71" stroke-width="4" stroke-linecap="round"/>
+                </svg>
+                <div class="placeholder-text">图片占位符</div>
+              </div>
+              <div id="posterCaption" class="poster-caption">图片由AI生成</div>
+            </div>
+
+            <div class="type-box">
+              <div class="type-kicker" id="resultModeKicker">你的主类型</div>
+              <div class="type-name" id="resultTypeName">F-C-T-S</div>
+              <div class="match" id="matchBadge">匹配度 92%</div>
+              <div class="type-subname" id="resultTypeSub">系统备注会显示在这里。</div>
+            </div>
+          </div>
+
+          <div class="analysis-box">
+            <h3>该人格的简单解读</h3>
+            <p id="resultDesc"></p>
+          </div>
+
+          <div class="dim-box">
+            <h3>特殊属性评分</h3>
+            <div id="dimList" class="dim-list"></div>
+          </div>
+
+          <div class="note-box">
+            <h3>友情提示</h3>
+            <p id="funNote">本测试仅供娱乐，别拿它当诊断、面试、相亲、分手、招魂、算命或人生判决书。</p>
+          </div>
+        </div>
+
+        <div class="result-actions">
+          <div style="display:flex; gap:12px; flex-wrap:wrap;">
+            <button id="restartBtn" class="btn-secondary">重新测试</button>
+            <button id="toTopBtn" class="btn-primary">回到首页</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    // 题库数据
+    const questions = [
+  {
+    "id": "1",
+    "text": "如果你是策划，在下个版本松伦让你送出40抽，你会以怎样的方法分给玩家？",
+    "options": [
+      {
+        "id": "A",
+        "text": "既然老板都发话了那还说啥，40抽签到给你了呗",
+        "scores": {
+          "公平": 2
+        }
+      },
+      {
+        "id": "B",
+        "text": "分析一下怎样提高热度，设计一些活动把奖励送出去",
+        "scores": {
+          "效率": 2
+        }
+      },
+      {
+        "id": "C",
+        "text": "40抽？我看3抽就够了",
+        "scores": {
+          "报复社会": 2,
+          "神人主义": 2,
+          "串子": 1
+        }
+      },
+      {
+        "id": "D",
+        "text": "把这个活推给同事",
+        "scores": {
+          "摆烂主义": 2
+        }
+      }
+    ]
+  },
+  {
+    "id": "2",
+    "text": "如果你正在星炬学院做一门课的助教，你更倾向于怎样给分？",
+    "options": [
+      {
+        "id": "A",
+        "text": "教授，我觉得所有的同学表现都很好，能不能全部给一百分？",
+        "scores": {
+          "天真浪漫": 2
+        }
+      },
+      {
+        "id": "B",
+        "text": "通过考试题区分同学，付出努力的同学应该得到回报",
+        "scores": {
+          "效率": 2
+        }
+      },
+      {
+        "id": "C",
+        "text": "既然选课的同学都信任我们，就通过作业把优秀率捞满吧",
+        "scores": {
+          "公平": 2
+        }
+      },
+      {
+        "id": "D",
+        "text": "想及格？想得美。",
+        "scores": {
+          "报复社会": 2
+        }
+      }
+    ]
+  },
+  {
+    "id": "3",
+    "text": "在穗波市，你见到了很多有特殊能力的共鸣者，你会认为：",
+    "options": [
+      {
+        "id": "A",
+        "text": "他们能力更强，应该为社会做出更多贡献，我们也更需要尊重他们",
+        "scores": {
+          "效率": 2
+        }
+      },
+      {
+        "id": "B",
+        "text": "我不认为应该区分对待这些人和其他普通人",
+        "scores": {
+          "公平": 2
+        }
+      },
+      {
+        "id": "C",
+        "text": "有没有能变身皮套狗也能拿22w同接的共鸣能力",
+        "scores": {
+          "神人主义": 2,
+          "串子": 1
+        }
+      },
+      {
+        "id": "D",
+        "text": "没有共鸣者我是不是就不用考虑这个问题了",
+        "scores": {
+          "大西王": 2
+        }
+      }
+    ]
+  },
+  {
+    "id": "4",
+    "text": "如何评判一个角色是否塑造成功？",
+    "options": [
+      {
+        "id": "A",
+        "text": "看流水，市场满意才是真的满意",
+        "scores": {
+          "效率": 2,
+          "串子": 1
+        }
+      },
+      {
+        "id": "B",
+        "text": "看同接，大家满意才是真的满意",
+        "scores": {
+          "公平": 2,
+          "串子": 1
+        }
+      },
+      {
+        "id": "C",
+        "text": "看铸币大头，这期拉了，这期神了",
+        "scores": {
+          "神人主义": 2
+        }
+      },
+      {
+        "id": "D",
+        "text": "看抽数，能让我抽到就是成功",
+        "scores": {
+          "日子人": 2
+        }
+      }
+    ]
+  },
+  {
+    "id": "5",
+    "text": "策划说你可以从两个被刀的角色中确定地拯救一个，同时你也可以尝试救两人，但有很大的失败风险。你的选择是：",
+    "options": [
+      {
+        "id": "A",
+        "text": "救一个总比一个都不救好…仔细考虑救救谁吧",
+        "scores": {
+          "效率": 2
+        }
+      },
+      {
+        "id": "B",
+        "text": "不行，一个都不能少",
+        "scores": {
+          "公平": 2
+        }
+      },
+      {
+        "id": "C",
+        "text": "我选择原地睡觉，老老实实当个摄像头，别让我选这个",
+        "scores": {
+          "摆烂主义": 2,
+          "串子": 1
+        }
+      },
+      {
+        "id": "D",
+        "text": "角色有自己的生命，策划你怎么忍心……",
+        "scores": {
+          "天真浪漫": 2,
+          "串子": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": "6",
+    "text": "你正在参观莫塔里家族的私人声骸研发室，你认为：",
+    "options": [
+      {
+        "id": "A",
+        "text": "私人声骸才能更加匹配需求，应该大力推广",
+        "scores": {
+          "效率": 2
+        }
+      },
+      {
+        "id": "B",
+        "text": "声骸应该是公共的，不能让一部分人独享使用权",
+        "scores": {
+          "公平": 2
+        }
+      },
+      {
+        "id": "C",
+        "text": "什么东西，影响我吗？",
+        "scores": {
+          "日子人": 2
+        }
+      },
+      {
+        "id": "D",
+        "text": "能换星声吗",
+        "scores": {
+          "啥子": 2
+        }
+      }
+    ]
+  },
+  {
+    "id": "7",
+    "text": "你正在参观七丘的角斗大赛，比赛结束后，你有一束鲜花可以送给比赛者，你会：",
+    "options": [
+      {
+        "id": "A",
+        "text": "把鲜花送给冠军，胜利者应该拥有荣耀",
+        "scores": {
+          "效率": 2
+        }
+      },
+      {
+        "id": "B",
+        "text": "把鲜花送给亚军，一步之遥输掉比赛应该得到安慰",
+        "scores": {
+          "天真浪漫": 2
+        }
+      },
+      {
+        "id": "C",
+        "text": "冠军亚军应该共享鲜花，双方共同付出才有了这场精彩的比赛",
+        "scores": {
+          "公平": 2
+        }
+      },
+      {
+        "id": "D",
+        "text": "在鲜花里下点挥发性毒药",
+        "scores": {
+          "报复社会": 2
+        }
+      }
+    ]
+  },
+  {
+    "id": "8",
+    "text": "你觉得，在深塔中哪种方案最合理：",
+    "options": [
+      {
+        "id": "A",
+        "text": "减小难度，大家好才是真的好",
+        "scores": {
+          "公平": 2
+        }
+      },
+      {
+        "id": "B",
+        "text": "在保留低难度区同时设置高难度关卡，不然练度高的玩家练角色有什么用",
+        "scores": {
+          "效率": 2
+        }
+      },
+      {
+        "id": "C",
+        "text": "多造点粪怪出来",
+        "scores": {
+          "报复社会": 2
+        }
+      },
+      {
+        "id": "D",
+        "text": "我从来不打深塔的",
+        "scores": {
+          "摆烂主义": 2
+        }
+      }
+    ]
+  },
+  {
+    "id": "9",
+    "text": "一个理想的游戏社区应该是：",
+    "options": [
+      {
+        "id": "A",
+        "text": "官方积极参与社区宣传，主要看官方内容",
+        "scores": {
+          "中央": 2
+        }
+      },
+      {
+        "id": "B",
+        "text": "玩家才是社区的灵魂，主要看二创内容",
+        "scores": {
+          "分权": 2
+        }
+      },
+      {
+        "id": "C",
+        "text": "正常内容干嘛要来社区看，来社区就得看五字神人吧",
+        "scores": {
+          "神人主义": 2,
+          "串子": 1
+        }
+      },
+      {
+        "id": "D",
+        "text": "来看社区别带脑子，咕咕嘎嘎！",
+        "scores": {
+          "啥子": 2
+        }
+      }
+    ]
+  },
+  {
+    "id": "10",
+    "text": "关于前瞻评论区，你更多关注：",
+    "options": [
+      {
+        "id": "A",
+        "text": "官方发的前瞻总结",
+        "scores": {
+          "中央": 2
+        }
+      },
+      {
+        "id": "B",
+        "text": "玩家的声音，对新版本的看法",
+        "scores": {
+          "分权": 2,
+          "串子": 1
+        }
+      },
+      {
+        "id": "C",
+        "text": "kyg大战mygo，你知道吗？",
+        "scores": {
+          "报复社会": 2,
+          "串子": 1
+        }
+      },
+      {
+        "id": "D",
+        "text": "懒得看前瞻喵，直接拿兑换码不香吗",
+        "scores": {
+          "摆烂主义": 2
+        }
+      }
+    ]
+  },
+  {
+    "id": "11",
+    "text": "假设你正组织打败利维亚坦后的灾后重建，你更倾向于：",
+    "options": [
+      {
+        "id": "A",
+        "text": "由教会出面组织重建，必须团结所有人",
+        "scores": {
+          "中央": 2
+        }
+      },
+      {
+        "id": "B",
+        "text": "交给莫塔里和斐萨烈吧，相信家族的智慧",
+        "scores": {
+          "分权": 2
+        }
+      },
+      {
+        "id": "C",
+        "text": "要重建，先把那些坏东西和叛徒揪出来清除掉。",
+        "scores": {
+          "大西王": 2
+        }
+      },
+      {
+        "id": "D",
+        "text": "我就一打工人，老板说啥就是啥",
+        "scores": {
+          "日子人": 2
+        }
+      }
+    ]
+  },
+  {
+    "id": "12",
+    "text": "某日，你走进马和的店铺，买鸡蛋用光了贝币，你会：",
+    "options": [
+      {
+        "id": "A",
+        "text": "举报到令尹那里，让朝廷出面管管奸商",
+        "scores": {
+          "中央": 2
+        }
+      },
+      {
+        "id": "B",
+        "text": "市场上肯定还有别的地方能买鸡蛋……我去黑海岸买也不来你这了",
+        "scores": {
+          "分权": 2
+        }
+      },
+      {
+        "id": "C",
+        "text": "奸商受死！",
+        "scores": {
+          "大西王": 2
+        }
+      },
+      {
+        "id": "D",
+        "text": "几天后又在马和这里花光了贝币",
+        "scores": {
+          "啥子": 2
+        }
+      }
+    ]
+  },
+  {
+    "id": "13",
+    "text": "假设你是星炬学院的老师，你更倾向于下面哪种教学方式：",
+    "options": [
+      {
+        "id": "A",
+        "text": "认真备课，按自己的理解讲授知识核心",
+        "scores": {
+          "中央": 2
+        }
+      },
+      {
+        "id": "B",
+        "text": "反转课堂，学生才最了解自己的内心",
+        "scores": {
+          "分权": 2
+        }
+      },
+      {
+        "id": "C",
+        "text": "读读PPT得了，别太认真",
+        "scores": {
+          "摆烂主义": 2
+        }
+      },
+      {
+        "id": "D",
+        "text": "我都当老师了不整点活？搞点神人私货进去",
+        "scores": {
+          "神人主义": 2
+        }
+      }
+    ]
+  },
+  {
+    "id": "14",
+    "text": "如果你需要和小组做一个课题，还有一周就要DDL了，你会：",
+    "options": [
+      {
+        "id": "A",
+        "text": "效率优先，最有能力者或最有想法者作为组长分配任务，推进工作",
+        "scores": {
+          "中央": 2
+        }
+      },
+      {
+        "id": "B",
+        "text": "充分讨论，即使时间紧也要尊重每个人的想法",
+        "scores": {
+          "分权": 2
+        }
+      },
+      {
+        "id": "C",
+        "text": "不是还有一周呢么",
+        "scores": {
+          "摆烂主义": 2
+        }
+      },
+      {
+        "id": "D",
+        "text": "我不道啊？",
+        "scores": {
+          "啥子": 2
+        }
+      }
+    ]
+  },
+  {
+    "id": "15",
+    "text": "如果你管理黑海岸，你会怎样设计泰缇斯系统：",
+    "options": [
+      {
+        "id": "A",
+        "text": "计算最优选项，然后落实理论最优解",
+        "scores": {
+          "中央": 2
+        }
+      },
+      {
+        "id": "B",
+        "text": "让执花们表达意见，听取他们的意见做出决策",
+        "scores": {
+          "分权": 2
+        }
+      },
+      {
+        "id": "C",
+        "text": "认真地和执花们讨论，大家风雨同舟一定能度过所有考验",
+        "scores": {
+          "天真浪漫": 2
+        }
+      },
+      {
+        "id": "D",
+        "text": "正义女神手执长剑，必须严格纪律令行禁止，有害者死",
+        "scores": {
+          "大西王": 2
+        }
+      }
+    ]
+  },
+  {
+    "id": "16",
+    "text": "当你走出倒悬塔，卡提希娅对你说她想要变得比你更强，你的反应是：",
+    "options": [
+      {
+        "id": "A",
+        "text": "如果之后再有危机，我不在的话，她就可以救世了",
+        "scores": {
+          "中央": 2
+        }
+      },
+      {
+        "id": "B",
+        "text": "如果我被鸣式侵蚀，至少还有她",
+        "scores": {
+          "分权": 2
+        }
+      },
+      {
+        "id": "C",
+        "text": "我看是想要正义骑士大战邪恶漂泊者的战败cg了",
+        "scores": {
+          "神人主义": 2
+        }
+      },
+      {
+        "id": "D",
+        "text": "那太好了，那我就可以不用干活了",
+        "scores": {
+          "摆烂主义": 2
+        }
+      }
+    ]
+  },
+  {
+    "id": "17",
+    "text": "你觉得在一个游戏里喊很多个人老婆这个行为：",
+    "options": [
+      {
+        "id": "A",
+        "text": "呃 二游里说说得了，反正是假的",
+        "scores": {
+          "传统": 2
+        }
+      },
+      {
+        "id": "B",
+        "text": "完全不可接受！这种东西都不避着人吗",
+        "scores": {
+          "传统": 4
+        }
+      },
+      {
+        "id": "C",
+        "text": "我都玩游戏了还不让我开后宫？",
+        "scores": {
+          "进步": 2
+        }
+      },
+      {
+        "id": "D",
+        "text": "本来人与人的情感就不用受限，喜欢就可以叫老婆",
+        "scores": {
+          "进步": 4
+        }
+      }
+    ]
+  },
+  {
+    "id": "18",
+    "text": "神秘写信女某次给你写信时，提出希望你回去看看她，你会：",
+    "options": [
+      {
+        "id": "A",
+        "text": "毕竟是第一个遇到的角色...回去看看吧",
+        "scores": {
+          "传统": 2
+        }
+      },
+      {
+        "id": "B",
+        "text": "你说得对，但我还有其他老婆要照顾",
+        "scores": {
+          "进步": 2
+        }
+      },
+      {
+        "id": "C",
+        "text": "你是谁？我跳过人生了",
+        "scores": {
+          "摆烂主义": 2,
+          "串子": 1
+        }
+      },
+      {
+        "id": "D",
+        "text": "既然她都写信了，还是多看看她吧，别让她太伤心了",
+        "scores": {
+          "天真浪漫": 2
+        }
+      }
+    ]
+  },
+  {
+    "id": "19",
+    "text": "你更喜欢哪里的音乐：",
+    "options": [
+      {
+        "id": "A",
+        "text": "今州的，偏古风",
+        "scores": {
+          "传统": 2
+        }
+      },
+      {
+        "id": "B",
+        "text": "黎那汐塔的，偏古典",
+        "scores": {
+          "传统": 2
+        }
+      },
+      {
+        "id": "C",
+        "text": "星炬学院的，偏现代",
+        "scores": {
+          "进步": 2
+        }
+      },
+      {
+        "id": "D",
+        "text": "我喜欢哈基米版本的",
+        "scores": {
+          "进步": 4,
+          "啥子": 2,
+          "神人主义": 2
+        }
+      }
+    ]
+  },
+  {
+    "id": "20",
+    "text": "如何评价黎那汐塔对于岁主的信仰：",
+    "options": [
+      {
+        "id": "A",
+        "text": "是有益的，信仰可以指引人行善",
+        "scores": {
+          "传统": 4
+        }
+      },
+      {
+        "id": "B",
+        "text": "是有害的，不应该束缚人的思想",
+        "scores": {
+          "进步": 4
+        }
+      },
+      {
+        "id": "C",
+        "text": "不影响民众生活就好",
+        "scores": {
+          "日子人": 2
+        }
+      },
+      {
+        "id": "D",
+        "text": "菲比啾比",
+        "scores": {
+          "啥子": 2,
+          "天真浪漫": 2
+        }
+      }
+    ]
+  },
+  {
+    "id": "21",
+    "text": "假设你是星炬学院一个学生，你会希望自己的理论：",
+    "options": [
+      {
+        "id": "A",
+        "text": "站在巨人肩膀上，整合现有理论",
+        "scores": {
+          "传统": 2
+        }
+      },
+      {
+        "id": "B",
+        "text": "我要写一篇0参考文献的开山之作",
+        "scores": {
+          "进步": 2
+        }
+      },
+      {
+        "id": "C",
+        "text": "随便什么都行，能让我毕业就行",
+        "scores": {
+          "日子人": 2
+        }
+      },
+      {
+        "id": "D",
+        "text": "别整那些没用的，不如翘课去玩拉海洛方块",
+        "scores": {
+          "啥子": 2
+        }
+      }
+    ]
+  },
+  {
+    "id": "22",
+    "text": "这个题你该选A",
+    "options": [
+      {
+        "id": "A",
+        "text": "好的",
+        "scores": {
+          "传统": 2
+        }
+      },
+      {
+        "id": "B",
+        "text": "凭啥",
+        "scores": {
+          "进步": 2
+        }
+      },
+      {
+        "id": "C",
+        "text": "如果你不知道选什么就选C吧",
+        "scores": {
+          "啥子": 2
+        }
+      },
+      {
+        "id": "D",
+        "text": "所以这题选什么不一样吗？",
+        "scores": {
+          "日子人": 2
+        }
+      }
+    ]
+  },
+  {
+    "id": "23",
+    "text": "弗洛洛来找你哭诉，说她想了想，残星会其实并不正确，你的反应是：",
+    "options": [
+      {
+        "id": "A",
+        "text": "心软，别哭了我也有错",
+        "scores": {
+          "天真浪漫": 2
+        }
+      },
+      {
+        "id": "B",
+        "text": "知错能改善莫大焉",
+        "scores": {
+          "传统": 2
+        }
+      },
+      {
+        "id": "C",
+        "text": "认真听她为什么这么说",
+        "scores": {
+          "进步": 2
+        }
+      },
+      {
+        "id": "D",
+        "text": "一残辈残，吃我血誓盟约！",
+        "scores": {
+          "大西王": 2
+        }
+      }
+    ]
+  },
+  {
+    "id": "24",
+    "text": "某日，爱弥斯突然爬上你的床，你会：",
+    "options": [
+      {
+        "id": "A",
+        "text": "小爱快下去，你可是女儿啊！",
+        "scores": {
+          "传统": 4
+        }
+      },
+      {
+        "id": "B",
+        "text": "嗯...养女对我有情感可以理解，既然她想",
+        "scores": {
+          "进步": 2
+        }
+      },
+      {
+        "id": "C",
+        "text": "小爱可是女儿啊，这下更兴奋了",
+        "scores": {
+          "进步": 4
+        }
+      },
+      {
+        "id": "D",
+        "text": "我嘞个雷霆大雪绒啊",
+        "scores": {
+          "啥子": 2,
+          "神人主义": 2
+        }
+      }
+    ]
+  },
+  {
+    "id": "25",
+    "text": "一款游戏最重要的是：",
+    "options": [
+      {
+        "id": "A",
+        "text": "文化内核",
+        "scores": {
+          "传统": 2,
+          "保守": 2
+        }
+      },
+      {
+        "id": "B",
+        "text": "技术力",
+        "scores": {
+          "激进": 2
+        }
+      },
+      {
+        "id": "C",
+        "text": "创作者的真心付出",
+        "scores": {
+          "天真浪漫": 2
+        }
+      },
+      {
+        "id": "D",
+        "text": "能完美融入碎片时间",
+        "scores": {
+          "日子人": 2
+        }
+      }
+    ]
+  },
+  {
+    "id": "26",
+    "text": "如果飞讯加入AI功能，你的态度是：",
+    "options": [
+      {
+        "id": "A",
+        "text": "非常兴奋，角色终于活了",
+        "scores": {
+          "激进": 2
+        }
+      },
+      {
+        "id": "B",
+        "text": "保持怀疑，不会ooc吧？",
+        "scores": {
+          "保守": 2
+        }
+      },
+      {
+        "id": "C",
+        "text": "随缘体验",
+        "scores": {
+          "摆烂主义": 2
+        }
+      },
+      {
+        "id": "D",
+        "text": "还不够，给我上脑机接口",
+        "scores": {
+          "激进": 4,
+          "串子": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": "27",
+    "text": "克里斯托弗找到你，说他能救小爱出隧门，但他覆写的现实十分不稳定，可能导致大灾难，你的态度是：",
+    "options": [
+      {
+        "id": "A",
+        "text": "我有把握阻止灾难",
+        "scores": {
+          "激进": 2
+        }
+      },
+      {
+        "id": "B",
+        "text": "算了吧，应该还有别的方法",
+        "scores": {
+          "保守": 2
+        }
+      },
+      {
+        "id": "C",
+        "text": "谁拦我救小爱我杀谁",
+        "scores": {
+          "大西王": 2
+        }
+      },
+      {
+        "id": "D",
+        "text": "问问克苟有没有办法让大灾难必然发生",
+        "scores": {
+          "报复社会": 2
+        }
+      }
+    ]
+  },
+  {
+    "id": "28",
+    "text": "你是黑海岸的一名研究员，你发现了泰提斯系统中的一处可能bug，删除bug后系统运行效率会高很多，你会：",
+    "options": [
+      {
+        "id": "A",
+        "text": "既然检查了没问题，就修复bug吧",
+        "scores": {
+          "激进": 2
+        }
+      },
+      {
+        "id": "B",
+        "text": "祖传史山代码不可动，还是算了",
+        "scores": {
+          "保守": 2
+        }
+      },
+      {
+        "id": "C",
+        "text": "好机会，用bug删库",
+        "scores": {
+          "报复社会": 2
+        }
+      },
+      {
+        "id": "D",
+        "text": "不影响我的工资，不管",
+        "scores": {
+          "日子人": 2,
+          "摆烂主义": 2
+        }
+      }
+    ]
+  },
+  {
+    "id": "29",
+    "text": "星炬学院的一个项目会危害生态环境，对此，而绝大多数人都会受益，你的态度是：",
+    "options": [
+      {
+        "id": "A",
+        "text": "技术的目的应该是服务社会，这种技术不应该被推广",
+        "scores": {
+          "保守": 2
+        }
+      },
+      {
+        "id": "B",
+        "text": "先污染后治理，不推进项目怎么找项目副作用的解决方法",
+        "scores": {
+          "激进": 2
+        }
+      },
+      {
+        "id": "C",
+        "text": "给反对的人清理了不就没事了",
+        "scores": {
+          "激进": 4,
+          "大西王": 2
+        }
+      },
+      {
+        "id": "D",
+        "text": "再多想想，一定有两全其美的方法的",
+        "scores": {
+          "天真浪漫": 2
+        }
+      }
+    ]
+  },
+  {
+    "id": "30",
+    "text": "你是星炬学院的招生负责人，一个天赋异禀的前残星会成员希望入学，资料显示他已经改邪归正，你的态度是：",
+    "options": [
+      {
+        "id": "A",
+        "text": "还是算了吧",
+        "scores": {
+          "保守": 2
+        }
+      },
+      {
+        "id": "B",
+        "text": "有天赋，可以破格录取",
+        "scores": {
+          "激进": 2
+        }
+      },
+      {
+        "id": "C",
+        "text": "一残辈残，该杀！",
+        "scores": {
+          "大西王": 4
+        }
+      },
+      {
+        "id": "D",
+        "text": "在拉海洛，罪犯也有受教育的权力.....",
+        "scores": {
+          "神人主义": 2,
+          "串子": 1
+        }
+      }
+    ]
+  }
+];
+
+    // 类型映射
+    const TYPE_MAP = {
+      "公平": "F",
+      "效率": "E",
+      "中央": "C",
+      "分权": "D",
+      "传统": "T",
+      "进步": "P",
+      "保守": "S",
+      "激进": "R"
+    };
+
+    // 人格类型描述
+    const PERSONALITY_TYPES = {
+      "F-C-T-S": {
+        "title": "奥古斯塔",
+        "description": "你可能会崇尚“王道”，在一个有序的环境中，即使不付出那么大的代价前进，也可以人人安居乐业。或许你是伏尔泰的忠实信徒，或许你是哲人王本身，正如七丘的总督大人。"
+      },
+      "E-C-T-S": {
+        "title": "芬莱克",
+        "description": "你是一个激进的劳保。你不相信那些有风险的新事物，你有自己的判断。但世上的笨人和坏人实在太多了，因此你呼唤一个卫道士来保卫你认为正确的东西，即使形殁，仍留下希望。"
+      },
+      "F-D-T-S": {
+        "title": "菲比",
+        "description": "你很善良，你不想为了那些奇怪的新东西而毁了现有的美好。在现有的基础上，让人们更幸福，这才是你想做的。一切正如你在海上看到的那样，海风温和，风满茵足"
+      },
+      "E-D-T-S": {
+        "title": "坎特蕾拉",
+        "description": "你是一个温和主义者。你深知在做出任何改变时，都可能会承受意想不到的后果。作为经验丰富的家主大人，你相信事缓则圆。因此，在没有确定把握前，你不想改变航向。这并非是一种固执，而是一种谨慎的智慧。"
+      },
+      "F-C-P-S": {
+        "title": "今汐",
+        "description": "你是权力向善的推崇者。事实上，你不反对新东西的出现，包括更大的权力、更新的思想和更先进的技术。但你会审慎评估风险，做出最好的决策。在团队中你应该会是个不错的领导，但你丈夫要被一群人拐跑了（悲）。"
+      },
+      "E-C-P-S": {
+        "title": "露帕",
+        "description": "你向往强权的秩序。在你眼里，混乱和无序是自由必须吞咽的苦果，而你不喜欢这些。干脆、利落地解决问题才是你喜欢的风格。你说对吧，搭档？"
+      },
+      "F-D-P-S": {
+        "title": "夏空",
+        "description": "你是一个向往乌托邦的浪漫主义者。你对那些玄而又玄的新技术并不感兴趣，在你眼中，如何改造现有的这个世界才是更重要的。也许你会把一些浪漫的英雄或哲人王的故事传颂给其他人，这是你心中的白月光。"
+      },
+      "E-D-P-S": {
+        "title": "卡提希娅",
+        "description": "圣女大人，你身上有启蒙思想家的气质。在你眼中，相比全速前进，我们更需要确保的是平稳航行。你对权力和风险表示担忧，所以你会喜欢一种能尽可能避免坏结果出现的新制度。"
+      },
+      "F-C-T-R": {
+        "title": "漂泊者",
+        "description": "你要创造一个美好的世界，在这个世界人人平等，各尽其能，天下大同。但你知道要达到这一切，必须一直变强，直到变成一个救世主。别太累了，救世主。"
+      },
+      "E-C-T-R": {
+        "title": "莫宁",
+        "description": "技术是好的，我们要实事求是地把技术应用到具体情况中。你身上既有理想者的光辉，又有现实者的严谨。因此，你不愿意把步子迈的太大，调子定的太高。另外，恭喜你，测出这个结果说明你的政治课学的特别好。"
+      },
+      "F-D-T-R": {
+        "title": "爱弥斯",
+        "description": "你要创造一个美好的世界，在这个世界人人平等，各尽其能，天下大同。但你也深刻地明白，这并不代表着要有一个救世主，而是一群志同道合的人共同努力。毕竟，你想告诉某个人，别把所有担子都放在自己身上，对吧？"
+      },
+      "E-D-T-R": {
+        "title": "珂莱塔",
+        "description": "你是传统价值观里最开放的那一批人。你不排斥新技术，但你不愿意为了技术去打碎传统。对你来说，最好的就是一个人人各尽其能，能者多得的理想社会。太伟大了哈耶克。"
+      },
+      "F-C-P-R": {
+        "title": "弗洛洛",
+        "description": "你会不惜一切手段、不顾一切传统去达成一个理想。你并非乐于牺牲他人之徒，但你会为了你心中那个美好的世界而进行千百万次的尝试。希望你能成功，也希望你在水底别感冒了。"
+      },
+      "E-C-P-R": {
+        "title": "会长",
+        "description": "前进，前进，不择手段地前进。为了一个崇高的目标，你不惜抛弃一切也要追求至高的效率。因为你深知世界是一场危险的赛跑，冲的不够快就会被淘汰。不过，会长，小心血誓盟约。"
+      },
+      "F-D-P-R": {
+        "title": "守岸人",
+        "description": "技术应服务于人类。你喜爱新技术，但你深知任何技术都应该为人类的福祉做出贡献。因此，你希望技术能够被用于改善每一个人的生活。不过，这包括那个在黑海岸偷偷种鸢尾花的黄毛体育生吗？"
+      },
+      "E-D-P-R": {
+        "title": "洛瑟拉",
+        "description": "技术是创新之源，但创新并不是一个人的英雄主义，而是一个团队的协作。因此，你热衷于一个分散的组织来研究你所喜爱的技术。你的想法确实很符合现代主流科技观，但能不能V我篇paper，校长？"
+      }
+    };
+
+    // 特殊指标映射
+    const SPECIAL_ATTRIBUTES = [
+      "摆烂主义",
+      "日子人",
+      "神人主义",
+      "天真浪漫",
+      "啥子",
+      "报复社会",
+      "大西王",
+      "串子"
+    ];
+
+    // 特殊词条人格描述（阈值12）
+    const SPECIAL_PERSONALITY = {
+      "摆烂主义": {
+        "title": "达妮娅",
+        "description": "你是一群内卷神人中唯一一个在这个年纪能睡得着的。正所谓六十分万岁多一分浪费，能躺着赚到的学分凭什么要累成牛马去赚。毕竟，你是一个人，而不是一个机器。懒是人的天性，对吧？"
+      },
+      "日子人": {
+        "title": "赞妮",
+        "description": "你也是一个所谓的“日子人”，并不关心什么宏大的议题，只关心自己的生活。你也许会根据自己的屁股决定脑袋该放在哪里，但绝对不会费心神在站队问题时。过劳并不是牛马生存的阻碍，傲慢才是。妮儿，珂莱塔叫你去加班了。"
+      },
+      "神人主义": {
+        "title": "千咲",
+        "description": "现代科学赶走了神，于是便有了神人。你是一个自称为“普通学生”的神人，会想要把钢琴改成烧烤架。我敢打赌，如果你出生在隔壁，一定是一个乐子神的令使。那我还说啥了，这期神了！"
+      },
+      "天真浪漫": {
+        "title": "西格莉卡",
+        "description": "你纯的可怕，你不会去考虑任何现实主义，因为你是一个绝对理想，绝对乐观的人。在你的心中是一尘不染的浪漫理想主义。说真的，我很羡慕你。"
+      },
+      "啥子": {
+        "title": "琳奈",
+        "description": "这啥子人格？你是一个喜欢唐笑的乐天派，你和神人的区别在于神人绞尽脑汁去整烂活，而你只需要灵机一动。少看点凑企鹅、唐爱音和烂梗meme吧！"
+      },
+      "报复社会": {
+        "title": "克里斯托弗",
+        "description": "命运以痛吻我，我以痛吻报之。你绝对是冯诺依曼的忠实信徒，因为你和这个世界纯是零和博弈--你的快乐建立在他人痛苦上。你这种人最精了，先去瓦和旮旯里认妈妈然后去别的地方消耗。"
+      },
+      "大西王": {
+        "title": "丹瑾",
+        "description": "啊，原来是大西王来了。你是面对戈耳迪绳结的亚历山大，你从不会想着去解开它，而是斩断它。对你来说，问题都是人的问题，没有人也就没有问题。"
+      },
+      "串子": {
+        "title": "串子",
+        "description": "串是一种美德，串是互联网的胶水。恭喜你，你选对了每一个能串的选项。反串对于你而言像呼吸一样自然，求求你教我怎么串吧！"
+      }
+    };
+
+    // 页面控制
+    const screens = {
+      intro: document.getElementById('intro'),
+      test: document.getElementById('test'),
+      result: document.getElementById('result')
+    };
+
+    const startBtn = document.getElementById('startBtn');
+    const backIntroBtn = document.getElementById('backIntroBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const toTopBtn = document.getElementById('toTopBtn');
+
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    const questionList = document.getElementById('questionList');
+    const testHint = document.getElementById('testHint');
+
+    const resultTypeName = document.getElementById('resultTypeName');
+    const resultTypeSub = document.getElementById('resultTypeSub');
+    const matchBadge = document.getElementById('matchBadge');
+    const resultDesc = document.getElementById('resultDesc');
+    const dimList = document.getElementById('dimList');
+
+    let answers = {};
+
+    // 显示指定页面
+    function showScreen(screenName) {
+      Object.keys(screens).forEach(key => {
+        screens[key].classList.remove('active');
+      });
+      screens[screenName].classList.add('active');
+    }
+
+    // 渲染问题列表
+    function renderQuestions() {
+      questionList.innerHTML = '';
+      answers = {};
+
+      questions.forEach((q, index) => {
+        const questionEl = document.createElement('div');
+        questionEl.className = 'question';
+        questionEl.innerHTML = `
+          <div class="question-meta">
+            <div class="badge">问题 ${q.id}</div>
+          </div>
+          <div class="question-title">${q.text}</div>
+          <div class="options">
+            ${q.options.map(opt => `
+              <div class="option">
+                <input type="radio" name="q${q.id}" value="${opt.id}" data-question="${q.id}">
+                <div class="option-code">${opt.id}</div>
+                <div>${opt.text}</div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+        questionList.appendChild(questionEl);
+      });
+
+      // 添加事件监听器
+      document.querySelectorAll('input[type="radio"]').forEach(input => {
+        input.addEventListener('change', handleOptionChange);
+      });
+
+      updateProgress();
+    }
+
+    // 处理选项变更
+    function handleOptionChange(e) {
+      const questionId = e.target.dataset.question;
+      const optionId = e.target.value;
+      answers[questionId] = optionId;
+      updateProgress();
+    }
+
+    // 更新进度
+    function updateProgress() {
+      const answeredCount = Object.keys(answers).length;
+      const totalCount = questions.length;
+      const progress = (answeredCount / totalCount) * 100;
+
+      progressBar.style.width = `${progress}%`;
+      progressText.textContent = `${answeredCount} / ${totalCount}`;
+
+      if (answeredCount === totalCount) {
+        submitBtn.disabled = false;
+        testHint.textContent = "好了，你已经感悟到了旅行的意义，去看看结果吧。";
+      } else {
+        submitBtn.disabled = true;
+        testHint.textContent = "全选完才会放行。不准跳过人生。";
+      }
+    }
+
+    // 计算结果
+    function calculateResult() {
+      const scores = {};
+      const SPECIAL_THRESHOLD = 12;
+
+      // 计算分数
+      for (const [questionId, optionId] of Object.entries(answers)) {
+        const question = questions.find(q => q.id === questionId);
+        if (!question) continue;
+
+        const option = question.options.find(opt => opt.id === optionId);
+        if (!option) continue;
+
+        for (const [key, value] of Object.entries(option.scores)) {
+          scores[key] = (scores[key] || 0) + value;
+        }
+      }
+
+      // 计算主类型
+      const mainDimensions = [
+        ["公平", "效率"],
+        ["中央", "分权"],
+        ["传统", "进步"],
+        ["保守", "激进"]
+      ];
+      const mainTypeParts = [];
+      for (const [dim1, dim2] of mainDimensions) {
+        if ((scores[dim1] || 0) >= (scores[dim2] || 0)) {
+          mainTypeParts.push(TYPE_MAP[dim1]);
+        } else {
+          mainTypeParts.push(TYPE_MAP[dim2]);
+        }
+      }
+      const mainType = mainTypeParts.join('-');
+
+      // 获取主类型描述
+      const mainPersonality = PERSONALITY_TYPES[mainType] || {
+        title: "未知类型",
+        description: "你的人格类型尚未定义"
+      };
+
+      // 提取特殊属性
+      const extraAttributes = {};
+      for (const attr of SPECIAL_ATTRIBUTES) {
+        if (scores[attr]) {
+          extraAttributes[attr] = scores[attr];
+        }
+      }
+
+      // 检查是否有特殊词条达到阈值
+      const CHUANZI_THRESHOLD = 8;
+      let topSpecialAttr = null;
+      let topSpecialScore = 0;
+
+      // 串子优先检查（阈值8）
+      if (extraAttributes['串子'] && extraAttributes['串子'] >= CHUANZI_THRESHOLD) {
+        topSpecialAttr = '串子';
+        topSpecialScore = extraAttributes['串子'];
+      } else {
+        // 检查其他特殊词条（阈值12）
+        for (const [attr, score] of Object.entries(extraAttributes)) {
+          if (attr !== '串子' && score >= SPECIAL_THRESHOLD && score > topSpecialScore) {
+            topSpecialAttr = attr;
+            topSpecialScore = score;
+          }
+        }
+      }
+
+      // 决定最终显示的人格
+      let finalType, finalTitle, finalDescription, isSpecial;
+      if (topSpecialAttr) {
+        finalType = topSpecialAttr;
+        finalTitle = SPECIAL_PERSONALITY[topSpecialAttr].title;
+        finalDescription = SPECIAL_PERSONALITY[topSpecialAttr].description;
+        isSpecial = true;
+      } else {
+        finalType = mainType;
+        finalTitle = mainPersonality.title;
+        finalDescription = mainPersonality.description;
+        isSpecial = false;
+      }
+
+      return {
+        mainType,
+        finalType,
+        title: finalTitle,
+        description: finalDescription,
+        extraAttributes,
+        isSpecial,
+        topSpecialAttr,
+        topSpecialScore
+      };
+    }
+
+    // 渲染结果
+    function renderResult(result) {
+      resultTypeName.textContent = result.finalType;
+      resultTypeSub.textContent = result.title;
+      matchBadge.textContent = `匹配度 ${Math.floor(Math.random() * 10) + 90}%`;
+      resultDesc.textContent = result.description;
+
+      // 根据是否是特殊人格更新kicker
+      if (result.isSpecial) {
+        resultModeKicker.textContent = `特殊词条: ${result.topSpecialAttr}`;
+      } else {
+        resultModeKicker.textContent = "你的主类型";
+      }
+
+      // 生成并设置图片
+      const posterBox = document.getElementById('posterBox');
+      posterBox.innerHTML = '';
+
+      let imageSrc = '';
+      let posterCaptionText = '';
+
+      if (result.isSpecial) {
+        switch (result.topSpecialAttr) {
+          case '摆烂主义':
+            imageSrc = 'Pictures/摆烂主义.png';
+            posterCaptionText = '嗯哼？';
+            break;
+          case '日子人':
+            imageSrc = 'Pictures/日子人.jpg';
+            posterCaptionText = '妮儿这个命苦';
+            break;
+          case '神人主义':
+            imageSrc = 'Pictures/神人主义.png';
+            posterCaptionText = '普通学生';
+            break;
+          case '天真浪漫':
+            imageSrc = 'Pictures/天真浪漫.jpg';
+            posterCaptionText = '鸟儿为何会飞';
+            break;
+          case '啥子':
+            imageSrc = 'Pictures/啥子.jpg';
+            posterCaptionText = '这啥子角色';
+            break;
+          case '报复社会':
+            imageSrc = 'Pictures/报复社会.png';
+            posterCaptionText = '我对你的品味不感兴趣，克里斯托弗';
+            break;
+          case '大西王':
+            imageSrc = 'Pictures/大西王.png';
+            posterCaptionText = '天生万物以养人，人无一物以报天';
+            break;
+          case '串子':
+            imageSrc = 'Pictures/串子.png';
+            posterCaptionText = '串是一种美德，串是互联网的胶水';
+            break;
+          default:
+            imageSrc = 'Pictures/摆烂主义.png';
+            posterCaptionText = '怎么样，被我拿捏了吧？';
+        }
+      } else {
+        const mainType = result.mainType;
+        switch (mainType) {
+          case 'F-C-T-S':
+            imageSrc = 'Pictures/F-C-T-S.jpg';
+            posterCaptionText = '荣光归于七丘';
+            break;
+          case 'E-C-T-S':
+            imageSrc = 'Pictures/E-C-T-S.png';
+            posterCaptionText = '这下大芬哥真成石了';
+            break;
+          case 'F-D-T-S':
+            imageSrc = 'Pictures/F-D-T-S.png';
+            posterCaptionText = '海风温和，菲比啾比';
+            break;
+          case 'E-D-T-S':
+            imageSrc = 'Pictures/E-D-T-S.png';
+            posterCaptionText = 'AAA特效药批发';
+            break;
+          case 'F-C-P-S':
+            imageSrc = 'Pictures/F-C-P-S.jpg';
+            posterCaptionText = '什么时候回雪山';
+            break;
+          case 'E-C-P-S':
+            imageSrc = 'Pictures/E-C-P-S.jpg';
+            posterCaptionText = '柔情猫娘';
+            break;
+          case 'F-D-P-S':
+            imageSrc = 'Pictures/F-D-P-S.jpg';
+            posterCaptionText = '兼职部诗人';
+            break;
+          case 'E-D-P-S':
+            imageSrc = 'Pictures/E-D-P-S.jpg';
+            posterCaptionText = '今天要讲的故事是，正义的骑士，大战邪恶的漂泊者';
+            break;
+          case 'F-C-T-R':
+            imageSrc = 'Pictures/F-C-T-R.png';
+            posterCaptionText = '别…难过';
+            break;
+          case 'E-C-T-R':
+            imageSrc = 'Pictures/E-C-T-R.jpg';
+            posterCaptionText = '要致富先修路';
+            break;
+          case 'F-D-T-R':
+            imageSrc = 'Pictures/F-D-T-R.jpg';
+            posterCaptionText = '这也端水';
+            break;
+          case 'E-D-T-R':
+            imageSrc = 'Pictures/E-D-T-R.jpg';
+            posterCaptionText = '此处有高人指点';
+            break;
+          case 'F-C-P-R':
+            imageSrc = 'Pictures/F-C-P-R.jpg';
+            posterCaptionText = '我等过很久，我不会再等了';
+            break;
+          case 'E-C-P-R':
+            imageSrc = 'Pictures/E-C-P-R.png';
+            posterCaptionText = '关注飞行卡戎谢谢喵';
+            break;
+          case 'F-D-P-R':
+            imageSrc = 'Pictures/F-D-P-R.jpg';
+            posterCaptionText = '独属于你的蒙娜丽莎';
+            break;
+          case 'E-D-P-R':
+            imageSrc = 'Pictures/E-D-P-R.png';
+            posterCaptionText = '无所不能的校长';
+            break;
+          default:
+            imageSrc = 'Pictures/F-C-T-S.jpg';
+            posterCaptionText = '怎么样，被我拿捏了吧？';
+        }
+      }
+
+      const imageElement = document.createElement('img');
+      imageElement.src = imageSrc;
+      imageElement.alt = result.title;
+      imageElement.className = 'poster-image';
+      imageElement.style.width = '100%';
+      imageElement.style.maxHeight = '300px';
+      imageElement.style.objectFit = 'contain';
+      imageElement.style.borderRadius = '18px';
+      imageElement.style.background = 'rgba(255,255,255,0.75)';
+      posterBox.appendChild(imageElement);
+
+      // 添加图片下方的小字
+      const imageCaption = document.createElement('div');
+      imageCaption.className = 'image-caption';
+      imageCaption.style.fontSize = '12px';
+      imageCaption.style.color = 'var(--muted)';
+      imageCaption.style.margin = '8px 0';
+      imageCaption.style.textAlign = 'center';
+      imageCaption.textContent = '图片由AI生成';
+      posterBox.appendChild(imageCaption);
+
+      // 添加原有的caption
+      const posterCaption = document.createElement('div');
+      posterCaption.id = 'posterCaption';
+      posterCaption.className = 'poster-caption';
+      posterCaption.textContent = posterCaptionText;
+      posterBox.appendChild(posterCaption);
+
+      // 渲染特殊属性
+      dimList.innerHTML = '';
+      for (const [key, value] of Object.entries(result.extraAttributes)) {
+        const dimItem = document.createElement('div');
+        dimItem.className = 'dim-item';
+        dimItem.innerHTML = `
+          <div class="dim-item-top">
+            <div class="dim-item-name">${key}</div>
+            <div class="dim-item-score">${value}</div>
+          </div>
+        `;
+        dimList.appendChild(dimItem);
+      }
+    }
+
+    // 事件监听器
+    startBtn.addEventListener('click', () => {
+      showScreen('test');
+      renderQuestions();
+    });
+
+    backIntroBtn.addEventListener('click', () => {
+      showScreen('intro');
+    });
+
+    submitBtn.addEventListener('click', () => {
+      const result = calculateResult();
+      renderResult(result);
+      showScreen('result');
+    });
+
+    restartBtn.addEventListener('click', () => {
+      showScreen('test');
+      renderQuestions();
+    });
+
+    toTopBtn.addEventListener('click', () => {
+      showScreen('intro');
+    });
+  </script>
+</body>
+</html>
